@@ -1,0 +1,25 @@
+---
+title: Note on Bifunctors
+author: Stack Underflow
+date: '2021-08-09'
+categories:
+  - Notes
+tags:
+  - bifuntor
+  - category theory
+slug: note-on-bifunctors
+---
+
+This is a note based on the lecture about [functoriality and bifunctors](https://youtu.be/pUQ0mmbIdxs). The same topic is also discussed in the [*Functoriality*](https://bartoszmilewski.com/2015/02/03/functoriality/) chapter from the book [*Category Theory for Programmers*](https://bartoszmilewski.com/2014/10/28/category-theory-for-programmers-the-preface/).
+
+## What is discussed in this lecture?
+
+This lecture discussed two main topics:
+- What is a bifunctor
+- product and coproduct are bifunctors, in both *Hask* and general categories
+
+## What is a bifunctor?
+
+A bifunctor maps two objects $a$ and $b$, from categories $C$ and $D$
+
+
