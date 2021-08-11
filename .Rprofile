@@ -15,9 +15,10 @@ options(
   blogdown.serve_site.startup = FALSE,
   # to disable knitting Rmd files on save, set this option to FALSE
   blogdown.knit.on_save = TRUE,
-  # build .Rmd to .html (via Pandoc); to build to Markdown, set this option to 'markdown'
-  blogdown.method = 'html'
+  # Here I choose to render to markdown and apply the math solution here: 
+  # https://yihui.org/en/2018/07/latex-math-markdown/ See layouts/partials/footer/custom.html
+  blogdown.method = 'markdown'
 )
 
 # fix Hugo version
-options(blogdown.hugo.version = "0.83.1")
+options(blogdown.hugo.version = "0.87.0")
