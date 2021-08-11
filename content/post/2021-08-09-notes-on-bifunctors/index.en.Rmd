@@ -9,6 +9,7 @@ tags:
   - bifuntor
   - category theory
 slug: note-on-bifunctors
+image: images/definition.png
 ---
 
 This is a note based on the lecture about [functoriality and bifunctors](https://youtu.be/pUQ0mmbIdxs). The same topic is also discussed in the [*Functoriality*](https://bartoszmilewski.com/2015/02/03/functoriality/) chapter from the book [*Category Theory for Programmers*](https://bartoszmilewski.com/2014/10/28/category-theory-for-programmers-the-preface/).
