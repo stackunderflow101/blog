@@ -16,7 +16,7 @@ The book [Code: The Hidden Language of Computer Hardware and Software](https://l
 
 The book [Harley Hahn's Guide to Unix and Linux](http://www.harley.com/books/sg3.html) is a great introduction to Linux for first time users. It explains the concepts very well and makes sure you understand them clearly. Some contents like GUI are outdated and could be skipped. *(Strongly Recommended)*
 
-The book [How Linux Works](https://learning.oreilly.com/library/view/how-linux-works/9781098128913/) is best for people who want to become a power Linux user. It covers some deeper topics like disks, filesystems, networking, etc.
+The book [How Linux Works](https://learning.oreilly.com/library/view/how-linux-works/9781098128913/) is best for people who want to become a power Linux user. It covers some deeper topics like disks, filesystems, networking, etc. I recommend this book if you have used Linux regularly for 1 or 2 years.
 
 ## Programming Languages
 

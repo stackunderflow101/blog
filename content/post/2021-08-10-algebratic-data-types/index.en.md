@@ -20,7 +20,7 @@ Why a pair is called a product? We can make sense of it by counting possible val
 
 We also have commutative law and associative law for product types. For example, `(a, b)` and `(b, a)` and not strictly the same -- they have different memory layouts, but they are isomorphic, which means there is a one-to-one function between them (here it's just the `swap` function which exchanges the first and second member of the pairs). In this case, commutative law still holds -- up to isomorphism. Similarly, associative law also holds, which means `((a, b), c)` and `(a, (b, c))` are isomorphic.
 
-The product operation for numbers has an identity element 1 such that `\(1 \times a = a\)` and `\(a \times 1 = a\)`. Note that product is commutative so it's sufficient to specify either `\(1 \times a = a\)` or `\(a \times 1 = a\)`. Do we also have such identity element for types? According the to approach of counting possible values, we want to find a type which has only one value. In fact, such a type is called a *unit type*. In Haskell the unit type is written as `()` and contains only one value: `()`. Similar types are `void` in C++, `NoneType` in Python (the corresponding value is `None`) and `Unit` in Scala (the value is `()`). 
+The product operation for numbers has an identity element 1 such that `\(1 \times a = a\)` and `\(a \times 1 = a\)`. Note that product is commutative so it's sufficient to specify either `\(1 \times a = a\)` or `\(a \times 1 = a\)`. Do we also have such identity element for types? According to the approach of counting possible values, we want to find a type which has only one value. In fact, such a type is called a *unit type*. In Haskell the unit type is written as `()` and contains only one value: `()`. Similar types are `void` in C++, `NoneType` in Python (the corresponding value is `None`) and `Unit` in Scala (the value is `()`). 
 
 Does `\(1 \times a = a\)` also holds for product types? Yes! It's easy to argue that `((), a)` and `a` are isomorphic. As a result, we say the set of types is a commutative monoid up to the product operation, and the unit type is the identity element.
 
@@ -34,7 +34,16 @@ data Either a b = Left a | Right b
 
 How can we make sense of it? Again, the counting method. Suppose we have `\(n\)` possible value for type `a` and `\(m\)` for type `b`, how many possible values we have for `Either a b`? The answer is `\(a + b\)`, so comes the name "sum types".
 
-The sum of two types is also commutative and associative up to isomorphism. But what is the identity element corresponding to 0 in numbers? It should be a type with 0 possible values, so it's called the empty type. In Haskell it's `Void` and in Scala it's `Nothing`. A lot of languages do not have such type, like C++. Note that the type `void` in C++ is a unit type instead of an empty type. Here is the difference between Haskell `Void` and C++ `void`. 
+The sum of two types is also commutative and associative up to isomorphism, which means
+
+``` haskell
+Either a b ~ Either b a
+Either (Either a b) c  ~ Either a (Either b c)
+```
+
+(`~` means isomorphic)
+
+But what is the identity element corresponding to 0 in numbers? It should be a type with 0 possible values, so it's called the empty type. In Haskell it's `Void` and in Scala it's `Nothing`. A lot of languages do not have such type, like C++. Note that the type `void` in C++ is a unit type instead of an empty type. Here is the difference between Haskell `Void` and C++ `void`. 
 
 In Haskell, we can define functions like this:
 
@@ -50,17 +59,19 @@ In contrast, a C++ function whose argument is `void` could be called, just like 
 int func(void) {
     return 1;
 }
+
+int a = func();
 ```
 
-Why? because you actually provide a special value, a value that is the only inhabitant of type `void` to the function when calling them! 
+Why? because you actually provide a special value, a value that is the only inhabitant of type `void` to the `func` function when calling it! 
 
-Similarly, In Haskell you cannot define a function which returns `Void` -- because you cannot provide such a value to return! The Haskell equivalent of C++ functions returning `void` and functions returning `()`, the unit type.
+Similarly, In Haskell you cannot define a function which returns `Void` -- because you cannot provide such a value to return! The Haskell equivalent of C++ functions returning `void` are functions returning `()`, the unit type.
 
 In conclusion, C++ `void` is not an empty type but a unit type, and it's equivalent to Haskell `()` instead of `Void`.
 
-Note that in other languages, we have functions returning the empty type. For example, in Scala a function returning `Nothing` is used for situations like exceptions (i.e. the function does not return normally).
+Note that in other languages, we have functions returning the empty type and they can be useful. For example, in Scala a function returning `Nothing` is used for situations like exceptions (i.e. the function does not return normally).
 
-Let's go back to sum type. `Void` is indeed the identity element for sum operation because `Either Void a` is isomorphic to `a` (there is no way to construct the `Left` version of this type). As a result, the set of types is also a commutative monoid up to the sum operation, and the identity element is the empty type `Void`. 
+Let's go back to sum type. `Void` is indeed the identity element for sum operation because `Either Void a` is isomorphic to `a` (there is no way to construct the `Left` version of `Either Void a` so it's essentially the same as `a`). As a result, the set of types is also a commutative monoid up to the sum operation, and the identity element is the empty type `Void`. 
 
 Below is a table summerizing all the laws about types.
 
@@ -136,7 +147,9 @@ x &= 1 + ax \\
 &= 1 + a + aa + aaa + \cdots
 \end{aligned}`
 $$
-What does it mean? It means 
+What does it mean? It means a list is either empty (1), or a single element ($a$), or two elements ($aa$), or three elements ($aaa$), etc. 
+
+Or, in Haskell, someything like the following
 
 ``` haskell
 List a = Nil 
@@ -145,7 +158,6 @@ List a = Nil
         | Cons a (Cons a (Cons a Nil)) 
         | ... 
 ```
-or, a list is either empty (1), or a single element ($a$), or two elements ($aa$), or three elements ($aaa$), etc. 
 
 Another example is the definition of binary trees
 
@@ -173,7 +185,7 @@ It means, a tree is either
 
 ## Algebratic Data Types for other languages
 
-In C++, besides representing a product type with `std::pair`, we can also use a `struct` or `class`. For example, the following is the product of `int` and `bool`
+In C++, besides representing a product type with `std::pair`, we can also use a `struct` or `class`. For example, the following is the product of `int` and `bool` and it's isomorphic to a `pair<int, bool>`.
 
 ``` c++
 class Foo {
@@ -182,7 +194,7 @@ class Foo {
 }
 ```
 
-There are a lot of different ways to represent sum types in C++, for example:
+As for sum types, there are a lot of different ways to represent them in C++, for example:
 - Special values like negative values or null pointer could be used to represent `Maybe`
 - Enum types are another example of sum types, where every enum value is equivalent to a unit type
 - [`std::variant`](https://en.cppreference.com/w/cpp/utility/variant) is used to simulate `Either`
@@ -201,29 +213,29 @@ While being a functional language, Scala defines algebratic data types using a d
 
 ## Functions and Exponantials
 
-We already know that in some languages (primarily functional languages), functions are also data types, which means we can use functions as function arguments, return types, or define a variable with type `Function`. So how does functions fit into algebratic data types? 
+We already know that in some languages (primarily functional languages), functions are also data types, which means we can use functions as function arguments, return types, or define a variable whose type is a function. So how does functions fit into algebratic data types? 
 
 The answer might be surprising: functions are exponantials! In fact, function of type `a -> b` could be represented as `\(b^a\)`. 
 
-Why? Here comes our old friend -- couting possible values. Say we have type `Bool` which has 2 possible values, and type `Char` which has 256. How many possible functions are there between `Char` to `Bool`? The answer is `\(\underbrace{2 \times 2 \times 2 \cdots \times 2}_{256}\)`, or `\(2^{256}\)`. Generally, there are `\(m^n\)` possible functions between a type `a` with `\(n\)` values and type `b` with `\(m\)` values, so the functions between `a` and `b` are denoted as `\(b^a\)`. Even if there might be infinitely many inhabitants we still denote it as an exponantial.
+Why? Here comes our old friend -- couting possible values. Say we have type `Bool` which has 2 possible values, and type `Char` which has 256. How many possible functions are there from `Char` to `Bool`? The answer is `\(\underbrace{2 \times 2 \times 2 \cdots \times 2}_{256}\)`, or `\(2^{256}\)`. Generally, there are `\(m^n\)` possible functions from a type `a` with `\(n\)` values to a type `b` with `\(m\)` values, so the functions between `a` and `b` are denoted as `\(b^a\)`. Even if there might be infinitely many inhabitants we still denote it as an exponantial.
 
 Below are the interesting laws about functions.
 
 | Name      | Numbers | Types| Description |
 | ----------- | ----------- | --------- | -------- |
-| 0th power | `\(a^0 = 1\)` | `Void -> a ~ Unit`| There is only one function from `Void` to any type `a`, the `absurd` function. |
+| 0th power | `\(a^0 = 1\)` | `Void -> a ~ Unit`| There is only one function from `Void` to any type `a`, i.e. the `absurd` function. |
 | power of 0 |  `\(0^a = 0\)` |  | There are no functions returning `Void` |
 | 1st power  | `\(a^1 = a\)`  | `() -> a ~ a`| Each function from unit to a type `a` selects an element from `a` |
 | power of 1   | `\((1^a = 1)\)`  | `a -> () ~ Unit`| There is only one function from any type to `()`|
 | 2nd power | `\(a^2 = a \times a\)`  | `Bool -> a ~ (a, a)`| First element defines the mapping for `True`, and second element defines the mapping for `False`|
 | nth power  | `\(a^n = \underbrace{a \times a \cdots \times a}_{n}\)`  | `<a type containing n elements> -> a ~ (a, a, ... a)`|
-| exponantials of sums | `\(a^{b+c} = a^b\times c^c\)` | `Either a b -> c ~ (a => c, b => c)`|
+| exponantials of sums | `\(a^{b+c} = a^b\times c^c\)` | `Either a b -> c ~ (a -> c, b -> c)`|
 | exponantials over exponantials   | `\((a^b)^c = a^{b\times c}\)`  | `c -> b -> a ~ (b, c) -> a`| function currying |
 | exponantials over products  | `\((a \times b)^c = a^c \times b^c\)`  | `c -> (a, b) ~ (c -> a, c -> b)`|
 
 ## Conclusion
 
-There is magical similarity between type algebra and number algebra. The similarity comes from that we could define types algebraically, using constructs like sum, product and exponantial.
+There is magical similarities between type algebra and number algebra. The similaries come from that we could define types algebraically, using constructs like sum, product and exponential.
 
 ## Other resources
 

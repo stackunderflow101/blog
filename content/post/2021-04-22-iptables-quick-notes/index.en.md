@@ -27,11 +27,11 @@ Below is the general diagram of iptables. This is not the complete picture, only
 
 ![iptables](images/iptables.png)
 
-It helps to break the diagram down. Below is what is going on for incoming packets arriving this machine. The packets go through PREROUTING and then INPUT, before a local process consumes them.
+It helps to break the diagram down. Below is what is going on for incoming packets arriving this machine. The packets go through PREROUTING and then INPUT, before a local process consumes them. The box *routing* is the routing process, basically, it's the process to determine which network interface to use by inspecting the packets' ip address. Here for incoming packets, they go to the machine itself. 
 
 ![incoming](images/incoming.png) 
 
-Below is incoming packets destinating other devices (so this machine serves as the router).
+Below is incoming packets destinating other devices (so this machine serves as the router). They go to some other machines on the network so the routing module sends them to an output interface.
 
 ![router](images/router.png)
 
@@ -53,7 +53,7 @@ To access the Internet from the two computers in the local network, the followin
 iptables -t nat -A POSTROUTING -o eth0 -j SNAT --to-source 50.60.70.80
 ```
 
-This rule will replace the source address of any IP packets going to the Internet through interface eth0 with 50.60.70.80, the public IP address of the router. For any response packets, the reverse operation that sets the destination address to the private address of the connecting device (e.g. 192.168.1.2) is automatically applied so we do not need to worry about configuring it. Note that SNAT rules has to be configured on the POSTROUTING chain because the matching condition usually includes the output interface (in this case, eth0).
+This rule will replace the source address of any IP packets going to the Internet through interface eth0 with 50.60.70.80, the public IP address of the router. For any response packets, the reverse operation that sets the destination address to the private address of the connecting device (e.g. 192.168.1.2) is automatically applied so we do not need to worry about configuring it. Note that SNAT rules has to be configured on the POSTROUTING chain because the matching condition usually includes the output interface (in this case, eth0) so it can only be used when the routing decision has been made.
 
 However, our router may be allocated a dynamic address by DHCP instead of being configured a static one. In this case, we could use the MASQUERADE target, which is similar to SNAT except that we do not need to specify `--to-source` address. The public address of the router will be used automatically.
 
@@ -61,7 +61,7 @@ However, our router may be allocated a dynamic address by DHCP instead of being 
 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
  ```
 
-Another use case of NAT _port forwarding_. when we are running a service on one of our computers, say, 192.168.1.2, and would like to access it from the Internet. Suppose the service is opened on port 80 and we want to access it on port 8080, we will add the following DNAT (D stands for _destination_) rule.
+Another use case of NAT _port forwarding_. when we are running a service on one of our computers, say, 192.168.1.2, and would like to access it from the Internet. Suppose the service is opened on port 80 and we want to access it on port 8080 of the router, we will add the following DNAT (D stands for _destination_) rule.
 
 ```shell
 iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 8080 -j DNAT --to-destination 192.168.1.2:80
