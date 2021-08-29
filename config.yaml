@@ -61,7 +61,6 @@ params:
         license:
             enabled: true
             default: >- 
-                
                 Licensed under 
                 <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
                     CC BY-SA 4.0
@@ -107,7 +106,7 @@ params:
         cover:
             enabled: true
         content:
-            enabled: true
+            enabled: false
 
 ### Custom menu
 ### See https://docs.stack.jimmycai.com/configuration/custom-menu
