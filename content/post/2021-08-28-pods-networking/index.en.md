@@ -172,13 +172,18 @@ For all the configurations above, the pods on the same node are always connected
 default via 192.168.1.1 dev eth0
 ```
 
-In fact, Linux bridge has some performance penalty. Calico provides a different solution to same node pods networking. 
+The bridge plays an important role in the network configurations. It provides two functionality:
 
-### Same-node pods communication
+- communication between pods running on the same node goes through the bridge
+- for incoming packets destining a pod, the host routes it to the bridge and the bridge automatically dispatch the packet to the destination pod.
+
+However, Linux bridge has some performance penalty. The only way to get rid of such performance impact is stop using bridges. Calico provides an alternative solution to bridge.
+
+### Alternative to bridge
 
 ![calico](images/calico.png)
 
-Instead of connecting all the pods on the same node to a bridge, calico connects the other end of the veth link (`cali*`) to the host. How does `frontend-1` communicates with `backend-1`? In fact, the pods route tables are configured as:
+Instead of connecting all the pods on the same node to a bridge, calico connects the other end of the veth link (`cali*`) to the host, and same-node communication is routed by the host route table. The pods are configured to send all traffic to the host by the following route table configuration:
 
 ```shell
 default via 169.254.1.1 dev eth0 
@@ -192,13 +197,15 @@ net.ipv4.conf.cali1001.proxy_arp = 1
 net.ipv4.conf.cali1002.proxy_arp = 1
 ```
 
-With the `proxy_arp` option, the host will answer ARP requests from the pods. For example, `frontend-1` sends a packet to `backend-1`, so it asks the MAC address of 169.254.1.1 since it's the default gateway. The host will answer "Oh, I am 169.254.1.1, send the packet to me!" because it has `proxy_arp` set for the interface `cali1001`, even though it doesn't know where is 169.254.1.1. As a result, `frontend-1` sends the packet to the host. The destination IP address of the packet is set to `192.168.1.11`. The host then routes the packet to `backend-2` because of the routing rule `192.168.1.11 dev cali1002`.
+With the `proxy_arp` option, the host will answer ARP requests from the pods. For example, say `frontend-1` sends a packet to `backend-1`. The destination IP address of the packet is `192.168.1.11` so it matches the `default` rule. As a result, `frontend-1` first asks the MAC address of 169.254.1.1 since it's the default gateway. The host will answer "Oh, I am 169.254.1.1, send the packet to me!" because it has `proxy_arp` set for the interface `cali1001`, even though it doesn't know where is 169.254.1.1. As a result, `frontend-1` sends the packet to the host. The host then routes the packet to `backend-2` according to the routing rule `192.168.1.11 dev cali1002`. 
 
-This is calico implements same-node pods communication. The bridge is replaced by a magical IP address, the `proxy_arp` configuration and the `192.168.1.* dev cali*` routing rules in the host network. There will be `m` `cali*` interfaces and their `m` corresponding routing rules if there are `m` pods running on a node.
+For incoming packets, the `cali*` rules send them to the destination pods directly, without going through any bridge. What is important is the `blackhole` rule, which drops all the packets destining a non-existing pod. Without the blackhole rule the packets will be sent back to the outside of the host because they match the `default` rule.
+
+This is calico replaces the bridge. The bridge's functionality is implemented by a magical IP address, the `proxy_arp` configuration and the `192.168.1.* dev cali*` routing rules in the host network. There will be `m` `cali*` interfaces and their `m` corresponding routing rules if there are `m` pods running on a node, plus a blackhole rule.
 
 ### Cross-nodes pods networking
 
-The `tunl0` interface is a tunnel device. If you send a packet to `tunl0` with the gateway address set as the IP address of the destination node, the packet will be tunneled to the destination. For example, if `frontend-1` sends a packet to `backend-2`, the packet will be routed to `tunl0` by the routing rule `192.168.2.0/24 via 172.16.94.12 dev tunl0 onlink`. `tunl0` then sends the packet to 172.16.94.12, the gateway address of the packet. On node2, the rule `192.168.2.10 dev cali2001` routes the packet to `backend-2`.
+The `tunl0` interface is a tunnel device. If you send a packet to `tunl0` with the gateway address set as the IP address of the destination node, the packet will be tunneled to the destination. For example, if `frontend-1` sends a packet to `backend-2`, the packet will be routed to `tunl0` by the routing rule `192.168.2.0/24 via 172.16.94.12 dev tunl0 onlink`. `tunl0` then sends the packet to 172.16.94.12, the gateway address of the packet. On node2, the rule `192.168.2.10 dev cali2001` routes the packet to `backend-2`. Just like the switched network configuration, for a cluster with `n` nodes, each node has `n-1` outgoing rules for all of its neighbors.
 
 The parameter `onlink` is important. Basically, when there is no `onlink`, the gateway has to be in the same network as the host, which means node1 and node2 have to be switched together. When `onlink` is set, the host will pretend that the gateway is in the same network, even though they might be several routers away. You can see a [discussion](https://lartc.vger.kernel.narkive.com/XgcjFTGM/aw-onlink-option-for-ip-route) here.
 
