@@ -4,9 +4,9 @@ description: From Bartosz Milewski's lecture
 author: Stack Underflow
 date: '2021-08-09'
 categories:
-  - Category Theory
+  - Tech
 tags:
-  - bifuntor
+  - category-theory
 slug: note-on-bifunctors
 image: images/functors.jpeg
 ---

@@ -5,12 +5,10 @@ date: '2021-08-15'
 slug: covariance-and-contravariance
 image: images/functor.jpeg
 categories:
-  - Category Theory
-  - Functional Programming
+  - Tech
 tags:
-  - scala
-  - java
-  - haskell
+  - functional-programming
+  - category-theory
 ---
 
 ## Covariance and Controvariance for generics

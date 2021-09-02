@@ -3,20 +3,15 @@ title: Route tables and Iptables for Routing
 author: Stack Underflow
 date: '2021-08-28'
 categories:
-  - Linux
+  - Tech
 tags:
   - networking
+  - Linux
 image: images/iptables-filter.jpeg
+description: the first post in series Kubernetes Networking Explained
 ---
 
 Route tables and iptables are two utilities that are used in Linux for routing. This article explains how to use them for routing packets. 
-
-## Recommended resources
-
-I recommend these two videos to learn about iptables (and other networking related topics). 
-
-- [金枪鱼之夜：坏人的 iptables 小讲堂](https://youtu.be/w_vGD-96O54)
-- [金枪鱼之夜：坏人的 iptables 小讲堂第二弹](https://youtu.be/Vnh8hYk6wZE)
 
 ## Route tables
 

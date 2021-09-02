@@ -3,12 +3,10 @@ title: Algebratic Data Types
 author: Stack Underflow
 date: '2021-08-10'
 categories:
-  - Functional Programming
-  - Category Theory
+  - Tech
 tags:
-  - haskell
-  - scala
-  - c++
+  - functional-programming
+  - category-theory
 slug: algebratic-data-types
 description: Can we define addition and multiplication for types?
 image: images/2+2.jpeg
