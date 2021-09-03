@@ -8,10 +8,10 @@ categories:
 tags: 
   - kubernetes
   - networking
-description: a blog series
+description: a blog post series
 ---
 
-This is a series of blogs explaining how Kubernetes networking behaves. 
+This is a series of blog posts explaining how Kubernetes networking behaves. 
 
 ## Posts
 
@@ -26,12 +26,14 @@ The Pluralsight course [Configuring and Managing Kubernetes Networking, Services
 
 The video [技术分享：Kubernetes Networking Model （赵锟）](https://youtu.be/HxS4s11rmyA) is a good overview.
 
-### Iptables
+### Networking basics
 
 The video series below explains iptables and other networking related topics in great detail.
 
 - [金枪鱼之夜：坏人的 iptables 小讲堂](https://youtu.be/w_vGD-96O54)
 - [金枪鱼之夜：坏人的 iptables 小讲堂第二弹](https://youtu.be/Vnh8hYk6wZE) 
+
+[Network Namespaces Basics Explained in 15 Minutes](https://youtu.be/j_UUnlVC2Ss) is a great introductory video on network namespaces. The problem is that there are several errors in the video.
 
 ### Pods networking
 
@@ -41,3 +43,6 @@ The video series below explains iptables and other networking related topics in 
 
 [Kubernetes Services and Iptables](https://msazure.club/kubernetes-services-and-iptables/)
 
+### DNS
+
+[Understanding CoreDNS in Kubernetes](https://youtu.be/qRiLmLACYSY)

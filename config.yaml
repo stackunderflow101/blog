@@ -1,5 +1,11 @@
 baseurl: https://stackunderflow.dev
 languageCode: en-us
+ignoreFiles:
+  - \.Rmd$
+  - \.Rmarkdown$
+  - _cache$
+  - \.knit\.md$
+  - \.utf8\.md$
 theme: "hugo-theme-stack"
 paginate: 5
 title: Stack Underflow
