@@ -89,10 +89,10 @@ Below is the home network shown in the route tables section
 To access the Internet from the two computers in the local network, the following SNAT (S stands for _source_) rule has to be added to the router:
 
 ```shell
-iptables -t nat -A POSTROUTING -o eth0 -j SNAT --to-source 50.60.70.80
+iptables -t nat -A POSTROUTING -o eth0 -s 192.168.1.0/24 -j SNAT --to-source 50.60.70.80
 ```
 
-Here `-t` stands for _table_, `-A` stands for _append_, `-o` stands for _output interface_, and `-j` snads for _jump_. This rule will replace the source address of any IP packets going to the Internet through interface eth0 with 50.60.70.80, the public IP address of the router. For any response packets, the reverse operation that sets the destination address to the private address of the connecting device (e.g. 192.168.1.2) is automatically applied so we do not need to worry about configuring it. The network address translation process works like the diagram below.
+Here `-t` stands for _table_, `-A` stands for _append_, `-s` stands for _source_, `-o` stands for _output interface_ and `-j` stands for _jump_. This rule will replace the source address of any IP packets going to the Internet through interface eth0 with 50.60.70.80, the public IP address of the router. For any response packets, the reverse operation that sets the destination address to the private address of the connecting device (e.g. 192.168.1.2) is automatically applied so we do not need to worry about configuring it. The network address translation process works like the diagram below.
 
 ![snat](images/snat.png)
 
@@ -101,7 +101,7 @@ Note that SNAT rules has to be configured in the POSTROUTING chain. Sometimes th
 However, our router may be allocated a dynamic address by DHCP instead of being configured a static one. In this case, we could use the MASQUERADE target, which is similar to SNAT except that we do not need to specify `--to-source` address. The public address of the router will be used automatically.
 
  ``` shell
-iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -o eth0 -j MASQUERADE
  ```
 
 MASQUERADE can only be used in the POSTROUTING chain because the source IP address of the packet will be obtained from the network interface it gets routed to (in our case, `eth0`). 
@@ -111,10 +111,10 @@ MASQUERADE can only be used in the POSTROUTING chain because the source IP addre
 Another use case of NAT is _port forwarding_. when we are running a service on one of our computers, say, PC1, and would like to access it from the Internet. Suppose the service is opened on port 80 and we want to access it on port 8080 of the router, we will add the following DNAT (D stands for _destination_) rule.
 
 ```shell
-iptables -t nat -A PREROUTING -m tcp -p tcp --dport 8080 -j DNAT --to-destination 192.168.1.2:80
+iptables -t nat -A PREROUTING -p tcp -m tcp --dport 8080 -j DNAT --to-destination 192.168.1.2:80
 ```
 
-The option `-p tcp` (`p` stands for _protocol_) matches for TCP connections (so this rule doesn't apply to UDP), while `--dport 8080` (`--dport` stands for _destination port_) matches for TCP traffic destining port 8080. This rule will replace the destination address of any IP packets going to port 8080 with 192.168.1.2, the IP address of the service. The port is also replaces with 80, the port of the service. For any response packets, the reverse operation is also automatically applied, just like in SNAT. The process works like the diagram below.
+The option `-p tcp` (`p` stands for _protocol_) matches for TCP connections (so this rule doesn't apply to UDP), while `--dport 8080` (`--dport` stands for _destination port_) matches for TCP traffic destining port 8080. This rule will replace the destination address of any IP packets going to port 8080 with 192.168.1.2, the IP address of the service. The port is also replaced with 80, the port of the service. For any response packets, the reverse operation is also automatically applied, just like in SNAT. The process works like the diagram below.
 
 ![dnat](images/dnat.png)
 
@@ -126,7 +126,7 @@ There is an issue with the setup above: A process running on the router cannot a
 iptables -t nat -A OUTPUT -p tcp --dport 8080 -j DNAT --to-destination 192.168.1.2:80
 ```
 
-Note that `-m tcp` is removed in the command above. It's also valid. Also note that, unlike machines from the Internet, the local process does not access the service on using IP address 50.60.70.80. It might use 127.0.0.1 (or other localhost address instead).
+Note that `-m tcp` is removed in the command above. It's also valid since the `tcp` extension is loaded automatically by `-p tcp`. Also note that, unlike machines from the Internet, the local process does not access the service on using IP address 50.60.70.80. It might use 127.0.0.1 (or other localhost address instead).
 
 ### Load balancing
 
@@ -170,6 +170,8 @@ The reverse rule of DNAT which sets the source address to 50.60.70.80:80 applies
 iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -o eth1 -p tcp --dport 80 -j MASQUERADE
 ```
 
+Note that we use the port number 80 here because the port number has already been translated from 8080 to 80 by the DNAT rule in PREROUTING chain.
+
 The whole process after MASQUERADE is added looks like the diagram below.
 
 ![hairpin working](images/hairpin-working.png)
@@ -183,5 +185,27 @@ The situation that a machine in the internal network access a service exposed th
 The case where a machine access itself through hairpin NAT is similar, but a little bit harder to reason. I include a diagram below. You might be wondering why a machine may access itself through hairpin NAT. One situation is when a group of machines are providing a service which is load-balanced by the router. If one of the machines access the service and the router happens to route the request back to the machine itself, a hairpin NAT looping back to the same machine will happen.
 
 ![hairpin same machine](images/hairpin-same.png)
+
+### Combining MASQUERADE rules
+
+You might find that the hairpin MASQUERADE rule is super similar to the MASQUERADE rule we added before for the machines to access the Internet. For comparison.
+
+This is the rule enabling Internet access for local computers:
+
+```shell
+iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -o eth0 -j MASQUERADE
+```
+
+This is the rule enabling hairpin NAT:
+
+```shell
+iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -o eth1 -p tcp --dport 80 -j MASQUERADE
+```
+
+Actually sometimes we combine them into one rule by not specifying the output interface. This rule enables Internet access and hairpin NAT on all ports.
+
+```shell
+iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -j MASQUERADE
+```
 
 

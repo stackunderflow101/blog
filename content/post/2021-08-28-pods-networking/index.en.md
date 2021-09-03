@@ -96,24 +96,6 @@ In this way, the two pods communicate with each other without using NAT. The rul
 
 Also note that nodes-to-pods communication also goes through the outgoing and incoming routing rules, so nodes and pods could communicate without NAT as well. It doesn't mean we do not do NAT at all. NAT does occur when a pod access something outside of the nodes and pods network, for example, the Internet, so MASQUERADE rules still need to be configured in iptables.
 
-### Hosts as routers
-
-What is interesting is that node2 is accepting traffic destining 192.168.2.0/24, but its own IP address is 172.16.94.12. it's handling traffic that does not go to its own IP address. In other words, node2 acts like a router (remember that routers are devices that accept traffic that does not go directly to itself) even though it's actually a host. The same goes for node1, and any other nodes in this Kubernetes cluster. The difference between those nodes and regular routers is that instead of routing traffic to physical machines, they route traffic to network namespaces running on themselves. 
-
-As a result, nodes in a Kubernetes cluster should set the kernel parameter `net.ipv4.ip_forward` to 1 to enable working like routers. This applies not only to the switched network setup, and not only to Kubernetes. This parameter has to be set to 1 if we would like to run containers on a host (e.g. use Docker to develop apps locally) otherwise the container cannot communicate with the outside world.
-
-A lot of Linux distributions have this parameter default to 1, but if it's not 1, we need to set it manually. To set the parameter temporarily, use the following command
-
-```shell
-sysctl -w net.ipv4.ip_forward=1
-```
-
-To set it permanently, add a file under `/etc/sysctl.d/` (like `/etc/sysctl.d/99-kubernetes-cri.conf`), and add the following line to this file
-
-```shell
-net.ipv4.ip_forward=1
-```
-
 ## Kubenet
 
 The switched network configuration only works fine for small clusters, small enough that all the machines can be switched together. What should we do for larger clusters? One possible optimization you might be thinking is moving all the routing rules like `192.168.2.0/24 via 172.16.94.12 dev eth0` to the router `172.16.94.1` for centralized management. In fact, this is what kubenet does.
