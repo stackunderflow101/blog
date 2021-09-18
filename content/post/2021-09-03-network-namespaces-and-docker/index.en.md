@@ -7,6 +7,7 @@ categories:
 tags:
   - Linux
   - networking
+image: images/network.jpg
 description: the third post in series Kubernetes Networking Explained
 ---
 
@@ -147,7 +148,7 @@ Docker sets up the MASQUERADE rule and the parameter `net.ipv4.ip_forward=1` wha
 
 ### Hosts as routers
 
-Why we need the kernel parameter `net.ipv4.ip_forwarding=1`? It turns out that it's because the host machine should act like a router. Remember that routers are devices that accept traffic that does not go directly to itself. The host is accepting traffic from 192.168.15.2 destining 8.8.8.8, but its own IP address is 172.16.94.12, neither the source address nor the destination address. The difference between the host and a regular router is that instead of routing traffic for physical machines, the host routes traffic for network namespaces running on themselves. 
+Why we need the kernel parameter `net.ipv4.ip_forwarding=1`? It turns out that it's because the host machine should act like a router. Remember that routers are devices that accept traffic that does not go directly to itself. The host is accepting traffic from 192.168.15.2 destining 8.8.8.8, but its own IP address is 172.16.94.12, neither the source address nor the destination address, hence it acts like a router. The difference between the host and a regular router is that instead of routing traffic for physical machines, the host routes traffic for network namespaces running on itself. 
 
 `net.ipv4.ip_forward` is the parameter controlling whether the host could act like a router. To set the parameter, use the following command
 
@@ -236,7 +237,7 @@ When this parameter is set, iptables rules will be applied to packets going thro
 
 ![bridge NAT](images/bridge-nat.png)
 
-I also want to call out that packets from the network namespaces like `blue` or `red` go through the PREROUTING chain instead of the OUTPUT chain, even though the namespaces run on the host machine. The host machine treats the network namespaces as if they are different machines.
+I also want to call out that packets from the network namespaces like `blue` or `red` go through the PREROUTING chain instead of the OUTPUT chain, even though the namespaces run on the host machine. The host machine treats the network namespaces as if they are different machines. That is why the PREROUTING chain rule is required even when we do not want other machines on the same network as the host to access the published port.
 
 ### Same namespace access
 

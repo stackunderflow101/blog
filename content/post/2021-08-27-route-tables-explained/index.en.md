@@ -8,6 +8,7 @@ categories:
 tags:
   - Linux
   - networking
+image: images/router.jpg
 description: the first post in series Kubernetes Networking Explained
 ---
 

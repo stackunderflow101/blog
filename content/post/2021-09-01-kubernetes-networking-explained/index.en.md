@@ -9,6 +9,7 @@ tags:
   - kubernetes
   - networking
   - linux
+image: images/future-world.jpg
 description: a blog post series
 ---
 

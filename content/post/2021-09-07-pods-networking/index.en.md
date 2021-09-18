@@ -8,6 +8,7 @@ tags:
   - kubernetes
   - networking
 slug: pods-networking
+image: images/network.jpg
 description: the fourth post in series Kubernetes Networking Explained
 ---
 

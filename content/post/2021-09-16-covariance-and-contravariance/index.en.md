@@ -7,6 +7,7 @@ categories:
 tags:
   - object-oriented-programming
 slug: covariance-and-contravariance
+image: images/bakcground.jpg
 ---
 
 ## Introduction
