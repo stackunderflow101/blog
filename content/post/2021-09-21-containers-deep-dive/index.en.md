@@ -26,7 +26,7 @@ The article series [Dockerless](https://mkdev.me/en/posts/dockerless-part-1-whic
 - Low level container standard (OCI) and tools (like `runc`)
 - Tools other than Docker to work with containers (like `buildah` and `podman`)
 
-Although already mentioned in the Dockerless series, I want to highlight here that the articles from [Daniel J Walsh](https://opensource.com/users/rhatdan) are great. For exanple, the series about rootless containers explains how Podman run containers rootlessly using user namespaces (In contrast, Docker by default does not use user namespaces and requires root privilege):
+Although already mentioned in the Dockerless series, I want to highlight here that the articles from [Daniel J Walsh](https://opensource.com/users/rhatdan) are great. For example, the series about rootless containers explains how Podman runs containers rootlessly using user namespaces (In contrast, Docker by default does not use user namespaces and requires root privilege):
 
 - [Podman and user namespaces: A marriage made in heaven](https://opensource.com/article/18/12/podman-and-user-namespaces)
 - [How does rootless Podman work?](https://opensource.com/article/19/2/how-does-rootless-podman-work)
