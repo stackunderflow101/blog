@@ -5,8 +5,7 @@ date: '2021-08-24'
 slug: linux-networking-fundamentals
 categories: 
   - Linux
-tags: 
-  - container
+tags:
   - networking
 image: images/datacenter.jpg
 description: a blog post series
